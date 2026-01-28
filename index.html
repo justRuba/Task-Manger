@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 20px; }
+    h2 { color: #333; }
+    input, select, button, textarea { padding: 5px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+    button { cursor: pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    table, th, td { border: 1px solid #aaa; }
+    th, td { padding: 8px; text-align: left; }
+    th { background-color: #eee; }
+    .container { background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Create User</h2>
+    <input type="text" id="user_id" placeholder="User ID (like student ID)">
+    <input type="text" id="username" placeholder="Username">
+    <input type="email" id="email" placeholder="Email (optional)">
+    <select id="user_role">
+      <option value="admin">Admin</option>
+      <option value="manager">Manager</option>
+      <option value="team_member">Team Member</option>
+    </select>
+    <button onclick="createUser()">Create User</button>
+  </div>
+
+  <div class="container">
+    <h2>Create Task</h2>
+    <input type="text" id="task_title" placeholder="Task Title">
+    <textarea id="task_description" placeholder="Description"></textarea>
+    <select id="task_priority">
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+    <select id="task_status">
+      <option value="todo">Todo</option>
+      <option value="in_progress">In Progress</option>
+      <option value="done">Done</option>
+    </select>
+    <input type="text" id="task_user" placeholder="Assign User ID">
+    <button onclick="createTask()">Create Task</button>
+  </div>
+
+  <div class="container">
+    <h2>Search Tasks by User</h2>
+    <input type="text" id="search_user" placeholder="User ID">
+    <button onclick="searchTasksByUser()">Search</button>
+    <table id="user_tasks_table"></table>
+  </div>
+
+  <div class="container">
+    <h2>Search User by Task</h2>
+    <input type="text" id="search_task" placeholder="Task ID">
+    <button onclick="searchUserByTask()">Search</button>
+    <table id="task_user_table"></table>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8000"; // FastAPI backend
+
+    async function createUser() {
+      const data = {
+        user_id: document.getElementById('user_id').value,
+        username: document.getElementById('username').value,
+        email: document.getElementById('email').value,
+        user_role: document.getElementById('user_role').value
+      };
+      const res = await fetch(`${API}/users/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.message || JSON.stringify(result));
+    }
+
+    async function createTask() {
+      const data = {
+        title: document.getElementById('task_title').value,
+        description: document.getElementById('task_description').value,
+        priority: document.getElementById('task_priority').value,
+        status: document.getElementById('task_status').value,
+        assign_user: document.getElementById('task_user').value
+      };
+      const res = await fetch(`${API}/tasks/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.message || JSON.stringify(result));
+    }
+
+    async function searchTasksByUser() {
+      const userId = document.getElementById('search_user').value;
+      const res = await fetch(`${API}/tasks/search_by_user?user_id=${userId}`);
+      const tasks = await res.json();
+      let html = "<tr><th>Task ID</th><th>Title</th><th>Status</th><th>Priority</th><th>Assigned User</th></tr>";
+      if(tasks.length === 0){
+        html += "<tr><td colspan='5'>No tasks found</td></tr>";
+      } else {
+        tasks.forEach(t => {
+          html += `<tr><td>${t.task_id}</td><td>${t.title}</td><td>${t.status}</td><td>${t.priority}</td><td>${t.assign_user}</td></tr>`;
+        });
+      }
+      document.getElementById('user_tasks_table').innerHTML = html;
+    }
+
+    async function searchUserByTask() {
+      const taskId = document.getElementById('search_task').value;
+      const res = await fetch(`${API}/tasks/search_user_by_task?task_id=${taskId}`);
+      const user = await res.json();
+      let html = "<tr><th>User ID</th><th>Username</th><th>Role</th></tr>";
+      if(user.user_id){
+        html += `<tr><td>${user.user_id}</td><td>${user.username}</td><td>${user.user_role}</td></tr>`;
+      } else {
+        html += "<tr><td colspan='3'>No user found</td></tr>";
+      }
+      document.getElementById('task_user_table').innerHTML = html;
+    }
+  </script>
+</body>
+</html>
