@@ -1,4 +1,4 @@
-# Task Management System
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/73d73621-85b1-4626-989e-32fa1c9a1c6f" /># Task Management System
 This is a simple API to help teams manage their tasks. It is built using FastAPI and saves data in two ways at the same time: in JSON files and a SQLite Database.
 
 ## How the project is organized
@@ -28,4 +28,10 @@ I followed a modular structure to keep the code clean:
 2. Run the app: Type: uvicorn main:app --reload
 
 3. Open the Dashboard: Go to http://127.0.0.1:8000/docs in your browser. This is the Swagger UI where you can test the API.
+
+## HTML page
+
+<img width="1920" height="778" alt="Screenshot (185)" src="https://github.com/user-attachments/assets/d7230cb4-26bb-4e44-a8d9-2a98a8411579" />
+
+<img width="1906" height="560" alt="Screenshot (186)" src="https://github.com/user-attachments/assets/b9c5d3e8-0fb5-4397-883f-164a17b72dca" />
 
